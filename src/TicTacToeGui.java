@@ -379,13 +379,11 @@ public class TicTacToeGui extends Application {
 		alert.setContentText("Make a decision.");
 		alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 		
-		
 		buttonTypeOne = new ButtonType("Play Again");
 		buttonTypeTwo = new ButtonType("Back to Menu");
 
 		alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo);
 
-		
 	}
 	
 	// Application launch
@@ -409,7 +407,7 @@ public class TicTacToeGui extends Application {
 		// X always goes first
 		currentPlayer = GamePiece.X;
 
-		// Initalize the game
+		// Initialize the game
 		Board.setGameState(GameState.PLAYING);
 		Board.clearGameArray();
 		
@@ -419,6 +417,8 @@ public class TicTacToeGui extends Application {
 				setButtonImage(btn , "");
 			}
 		}
+		
+		reseatButtons();
 		
 		// If the CPU has to go first . . .
 		if (currentPlayer == cpuPiece) {
@@ -702,6 +702,23 @@ public class TicTacToeGui extends Application {
 		
 	}
 	
+	public static void reseatButtons() {
+		
+		// On the rare occasion that animations bug, every new game will re-seat the game tiles. 
+		for (int r = 0; r < 3; r++) {
+			for (int c = 0; c < 3; c++) {
+				
+				Button btn = pieceDisplays[r][c];
+				
+				btn.setPrefSize(110, 110);
+				btn.setStyle("-fx-background-color: transparent; -fx-padding: 5, 5, 5, 5;");
+				btn.setLayoutX((r * 120) + 75);
+				btn.setLayoutY((c * 120) + 45);
+				
+			}
+		}
+	}
+	
 	public static Timeline setPieceDisplay(int row, int column, GamePiece piece){
 		
 		appendToMoves(piece + " placed at " + (row + 1) + ", " + (column + 1));
@@ -709,20 +726,25 @@ public class TicTacToeGui extends Application {
 		Button btn = pieceDisplays[row][column];
 		setButtonImage(btn, (piece == GamePiece.X) ? img_Icon_X : img_Icon_O);
 		
-		int curX = (int)btn.getLayoutX();
-		int curY = (int)btn.getLayoutY();
-		
-		btn.setLayoutX(curX - 20);
-		btn.setLayoutY(curY - 30);
+		int baseX = (row * 120) + 75;
+		int baseY = (column * 120) + 45;
+		btn.setPrefSize(110, 110);
+		btn.setStyle("-fx-background-color: transparent; -fx-padding: 5, 5, 5, 5;");
+		btn.setLayoutX(baseX - 12);
+		btn.setLayoutY(baseY - 30);
 		
 		Timeline animation = new Timeline(
-			new KeyFrame(Duration.millis(20), e -> {
-				btn.setLayoutX(curX);
-				btn.setLayoutY(curY);
-				System.out.println("Drop animation");
+			new KeyFrame(Duration.millis(20), e-> {
+				
+				double curX = btn.getLayoutX();
+				double curY = btn.getLayoutY();
+				
+				btn.setLayoutX((curX < baseX) ? curX + 4 : curX - 4 );
+				btn.setLayoutY((curY < baseY) ? curY + 10 : curY - 10);
 			})
 		);
-		animation.setCycleCount(1);
+
+		animation.setCycleCount(3);
 
 		return animation;
 		
